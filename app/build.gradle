@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.1'
 
     defaultConfig {
-        applicationId "com.example.android.sunshine"
+        applicationId "com.example.android.sunshine.app"
         minSdkVersion 10
         targetSdkVersion 25
         versionCode 1
@@ -18,6 +19,10 @@ android {
         }
     }
 
+    buildTypes.each {
+        it.buildConfigField 'String', 'OPEN_WEATHER_MAP_API_KEY', MyOpenWeatherMapApiKey
+    }
+
     dataBinding.enabled = true
 }
 
@@ -25,8 +30,8 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.1.0'
 
-    compile 'com.android.support:recyclerview-v7:25.0.1'
-    compile 'com.android.support:preference-v7:25.0.1'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:preference-v7:25.1.0'
 
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta3'
 
@@ -38,4 +43,8 @@ dependencies {
     androidTestCompile 'com.android.support:support-annotations:25.1.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
+
+    compile 'com.google.android.gms:play-services-wearable:10.0.1'
+
+    wearApp project(':watchface')
 }

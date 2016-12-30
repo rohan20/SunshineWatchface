@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.sunshine">
+    package="com.example.android.sunshine.app">
 
     <!-- This permission is necessary in order for Sunshine to perform network access. -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -64,7 +64,7 @@
         <!-- This is required for immediate syncs -->
         <service
             android:name=".sync.SunshineSyncIntentService"
-            android:exported="false" />
+            android:exported="true" />
 
         <!-- This is the Service declaration used in conjunction with FirebaseJobDispatcher -->
         <service
@@ -74,6 +74,7 @@
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>
