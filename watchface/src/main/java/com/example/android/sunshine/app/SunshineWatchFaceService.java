@@ -69,6 +69,8 @@ import static android.R.attr.max;
  */
 public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
+    private static final String WEATHER_PATH = "/update-weather";
+
     //    private static final String LOG_TAG = SunshineWatchFaceService.class.getSimpleName();
     private static final String LOG_TAG = "yyyyy";
 
@@ -148,6 +150,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         String maxTempText = "Max";
         String minTempText = "Min";
+        long weatherID = 0;
         Bitmap mWeatherIconBitmap;
 
         /**
@@ -336,7 +339,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             float margin = getResources().getDimension(R.dimen.margin);
             float centerXOfWatchface = bounds.centerX();
             float centerYOfWatchface = bounds.centerY();
-            margin = convertPixelsToDp(margin);
 
             String timeText = mAmbient ? String.format("%d:%02d", mCalendar.get(Calendar.HOUR), mCalendar.get(Calendar.MINUTE)) : String.format("%d:%02d:%02d", mCalendar.get(Calendar.HOUR), mCalendar.get(Calendar.MINUTE), mCalendar.get(Calendar.SECOND));
 
@@ -412,8 +414,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-//            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode() + " Error msg = " + connectionResult.getErrorMessage());
-            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode());
+            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode() + " Error msg = " + connectionResult.getErrorMessage());
         }
 
         @Override
@@ -430,69 +431,60 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             }
         }
 
-        public  void extractInfoFromDataItem(DataItem dataItem) {
+        private void extractInfoFromDataItem(DataItem dataItem) {
             DataMapItem dataMapItem = DataMapItem.fromDataItem(dataItem);
-
             maxTempText = dataMapItem.getDataMap().getString("max_temp");
             minTempText = dataMapItem.getDataMap().getString("min_temp");
-
-//            invalidate();
-
-            Asset weatherIconAsset = dataMapItem.getDataMap().getAsset("weather_icon");
-            GetBitmapTask bitmapTask = new GetBitmapTask();
-            bitmapTask.execute(weatherIconAsset);
+            weatherID = dataMapItem.getDataMap().getLong("weather_id");
+            mWeatherIconBitmap = getBitmapFromDrawable(weatherID);
+            invalidate();
         }
 
-        public class GetBitmapTask extends AsyncTask<Asset, Void, Bitmap> {
-
-            @Override
-            protected Bitmap doInBackground(Asset... assets) {
-                Asset asset = assets[0];
-                Bitmap iconBitmap = loadBitmapFromAsset(asset);
-
-                int size = Double.valueOf(SunshineWatchFaceService.this.getResources().getDimension(R.dimen.weather_icon_size)).intValue();
-                return Bitmap.createScaledBitmap(iconBitmap, size, size, false);
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap bitmap) {
-                mWeatherIconBitmap = bitmap;
-                postInvalidate();
-            }
+        private Bitmap getBitmapFromDrawable(long weatherID) {
+            return BitmapFactory.decodeResource(getResources(),
+                    getWeatherIconForWeatherCondition(weatherID));
         }
 
-        public Bitmap loadBitmapFromAsset(Asset asset) {
-            if (asset == null) {
-                throw new IllegalArgumentException("Asset cannot be null");
+        private int getWeatherIconForWeatherCondition(long weatherId) {
+
+        /*
+         * Based on weather code data for Open Weather Map.
+         */
+            if (weatherId == 0) {
+                Log.e(LOG_TAG, "Unknown Weather: " + weatherId);
+                return R.drawable.ic_default;
+            } else if (weatherId >= 200 && weatherId <= 232) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 300 && weatherId <= 321) {
+                return R.drawable.ic_light_rain;
+            } else if (weatherId >= 500 && weatherId <= 504) {
+                return R.drawable.ic_rain;
+            } else if (weatherId == 511) {
+                return R.drawable.ic_snow;
+            } else if (weatherId >= 520 && weatherId <= 531) {
+                return R.drawable.ic_rain;
+            } else if (weatherId >= 600 && weatherId <= 622) {
+                return R.drawable.ic_snow;
+            } else if (weatherId >= 701 && weatherId <= 761) {
+                return R.drawable.ic_fog;
+            } else if (weatherId == 761 || weatherId == 771 || weatherId == 781) {
+                return R.drawable.ic_storm;
+            } else if (weatherId == 800) {
+                return R.drawable.ic_clear;
+            } else if (weatherId == 801) {
+                return R.drawable.ic_light_clouds;
+            } else if (weatherId >= 802 && weatherId <= 804) {
+                return R.drawable.ic_cloudy;
+            } else if (weatherId >= 900 && weatherId <= 906) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 958 && weatherId <= 962) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 951 && weatherId <= 957) {
+                return R.drawable.ic_clear;
             }
-            ConnectionResult result =
-                    mGoogleApiClient.blockingConnect(1500, TimeUnit.MILLISECONDS);
-            if (!result.isSuccess()) {
-                return null;
-            }
-            // convert asset into a file descriptor and block until it's ready
-            InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
-                    mGoogleApiClient, asset).await().getInputStream();
-            mGoogleApiClient.disconnect();
 
-            if (assetInputStream == null) {
-                return null;
-            }
-            // decode the stream into a bitmap
-            return BitmapFactory.decodeStream(assetInputStream);
-        }
-
-        public float convertDpToPixel(float dp){
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-            return px;
-        }
-
-
-        public float convertPixelsToDp(float px){
-            DisplayMetrics metrics = getResources().getDisplayMetrics();
-            float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-            return dp;
+            Log.e(LOG_TAG, "Unknown Weather: " + weatherId);
+            return R.drawable.ic_default;
         }
 
     }

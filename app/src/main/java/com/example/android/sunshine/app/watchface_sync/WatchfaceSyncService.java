@@ -82,6 +82,7 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
 
         if (cursor.moveToFirst()) {
             Log.e(LOG_TAG, "cursor");
+
             int weatherId = cursor.getInt(INDEX_WEATHER_ID);
 
             double max = cursor.getDouble(INDEX_MAX_TEMP);
@@ -90,13 +91,10 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
             double min = cursor.getDouble(INDEX_MIN_TEMP);
             int minTemp = (int) Math.round(min);
 
-            int iconId = SunshineWeatherUtils.getSmallArtResourceIdForWeatherCondition(weatherId);
-            Bitmap iconBitmap = BitmapFactory.decodeResource(mContext.getResources(), iconId);
-
             PutDataMapRequest mapRequest = PutDataMapRequest.create(WEATHER_PATH).setUrgent();
             mapRequest.getDataMap().putString("max_temp", maxTemp + "°");
             mapRequest.getDataMap().putString("min_temp", minTemp + "°");
-            mapRequest.getDataMap().putAsset("weather_icon", createAssetFromBitmap(iconBitmap));
+            mapRequest.getDataMap().putLong("weather_id", weatherId);
             mapRequest.getDataMap().putLong("timestamp", System.currentTimeMillis());
 
             PutDataRequest request = mapRequest.asPutDataRequest();
@@ -114,13 +112,6 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
             });
         }
 
-    }
-
-
-    private static Asset createAssetFromBitmap(Bitmap bitmap) {
-        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
-        return Asset.createFromBytes(byteStream.toByteArray());
     }
 
     @Override
