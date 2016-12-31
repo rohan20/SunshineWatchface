@@ -2,36 +2,29 @@ package com.example.android.sunshine.app.watchface_sync;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.sunshine.app.data.WeatherContract;
-import com.example.android.sunshine.app.utilities.SunshineWeatherUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallbacks;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
-import java.io.ByteArrayOutputStream;
-
 /**
  * Created by Rohan on 30-Dec-16.
  */
 
-public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class WatchfaceSyncService implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    //    private static final String LOG_TAG = WatchfaceSyncService.class.getSimpleName();
-    private static final String LOG_TAG = "xxxxxxx";
+    private static final String LOG_TAG = WatchfaceSyncService.class.getSimpleName();
 
     private static final String WEATHER_PATH = "/update-weather";
 
@@ -61,7 +54,6 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
                 .addOnConnectionFailedListener(this)
                 .build();
 
-        Log.e(LOG_TAG, "mGoogleApiClient.connect()");
         mGoogleApiClient.connect();
     }
 
@@ -77,14 +69,12 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
         Uri weatherUri = WeatherContract.WeatherEntry.CONTENT_URI;
 
         // we'll query our contentProvider, as always
-        Cursor cursor = mContext.getContentResolver().query(weatherUri, WEATHER_PROJECTION, null, null, null);
-        Log.e(LOG_TAG, cursor.getCount() + "");
+        Cursor cursor = mContext.getContentResolver()
+                .query(weatherUri, WEATHER_PROJECTION, null, null, null);
 
         if (cursor.moveToFirst()) {
-            Log.e(LOG_TAG, "cursor");
 
             int weatherId = cursor.getInt(INDEX_WEATHER_ID);
-            Log.e("weather id = ", weatherId +"");
 
             double max = cursor.getDouble(INDEX_MAX_TEMP);
             int maxTemp = (int) Math.round(max);
@@ -100,15 +90,16 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
 
             PutDataRequest request = mapRequest.asPutDataRequest();
 
-            Wearable.DataApi.putDataItem(mGoogleApiClient, request).setResultCallback(new ResultCallbacks<DataApi.DataItemResult>() {
+            Wearable.DataApi.putDataItem(mGoogleApiClient, request)
+                    .setResultCallback(new ResultCallbacks<DataApi.DataItemResult>() {
                 @Override
                 public void onSuccess(DataApi.DataItemResult dataItemResult) {
-                    Log.e(LOG_TAG, "Data from app to wear sent successfully");
+
                 }
 
                 @Override
                 public void onFailure(Status status) {
-                    Log.e(LOG_TAG, "Data transmission unsuccessful");
+
                 }
             });
         }
@@ -117,16 +108,16 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Log.e(LOG_TAG, "onConnected()");
+
     }
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.e(LOG_TAG, "onConnectionSuspended()");
+
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.e(LOG_TAG, "onConnectionFailed() " + connectionResult.getErrorMessage() + " " + connectionResult.getErrorCode());
+
     }
 }
