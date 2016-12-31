@@ -84,6 +84,7 @@ public class WatchfaceSyncService implements GoogleApiClient.ConnectionCallbacks
             Log.e(LOG_TAG, "cursor");
 
             int weatherId = cursor.getInt(INDEX_WEATHER_ID);
+            Log.e("weather id = ", weatherId +"");
 
             double max = cursor.getDouble(INDEX_MAX_TEMP);
             int maxTemp = (int) Math.round(max);
