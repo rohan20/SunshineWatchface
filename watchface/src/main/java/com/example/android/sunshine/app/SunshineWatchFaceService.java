@@ -61,6 +61,8 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import static android.R.attr.max;
+
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
@@ -174,18 +176,23 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
             // Initialize the background paint
             mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.background));
+//            mBackgroundPaint.setColor(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.background));
+            mBackgroundPaint.setColor(resources.getColor(R.color.background));
 
             // Initialize date text and time text paint for hour, colon, and minutes
             mDatePaint = createTextPaint(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.digital_text));
+//            mDatePaint.setColor(resources.getColor(R.color.digital_text));
             mDatePaint.setTextSize(resources.getDimension(R.dimen.date_text_size));
             mTimePaint = createTextPaint(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.digital_text));
+//            mTimePaint.setColor(resources.getColor(R.color.digital_text));
             mTimePaint.setTextSize(resources.getDimension(R.dimen.time_text_size));
 
-            // Initialize temperature text paint for max and min temps
+//             Initialize temperature text paint for max and min temps
             mMinTempPaint = createTextPaint(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.digital_text));
+//            mMinTempPaint.setColor(resources.getColor(R.color.digital_text));
             mMinTempPaint.setTextSize(resources.getDimension(R.dimen.temp_text_size));
             mMaxTempPaint = createTextPaint(ContextCompat.getColor(SunshineWatchFaceService.this, R.color.digital_text));
+//            mMaxTempPaint.setColor(resources.getColor(R.color.digital_text));
             mMaxTempPaint.setTextSize(resources.getDimension(R.dimen.temp_text_size));
 
             // Allocate a Calendar to calculate local time using the UTC time and time zone
@@ -405,7 +412,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode() + " Error msg = " + connectionResult.getErrorMessage());
+//            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode() + " Error msg = " + connectionResult.getErrorMessage());
+            Log.e(LOG_TAG, "onConnection Failed: Code =  " + connectionResult.getErrorCode());
         }
 
         @Override
